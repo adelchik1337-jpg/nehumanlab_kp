@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#170812">
+<title>Мэтч-тест: Адель × Яна</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #170812;
+    color: #fbf2f6;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: -1;
+    background: linear-gradient(160deg, #170812 0%, #2b0d22 45%, #451335 100%);
+  }
+  .glow { position: fixed; border-radius: 50%; filter: blur(70px); pointer-events: none; z-index: 0; }
+  .glow-1 { width: 60vw; height: 60vw; max-width: 420px; max-height: 420px;
+    top: -12%; left: -18%; background: rgba(255,182,72,.22); }
+  .glow-2 { width: 65vw; height: 65vw; max-width: 460px; max-height: 460px;
+    bottom: -15%; right: -20%; background: rgba(255,107,157,.20); }
+
+  .wrap {
+    position: relative; z-index: 1;
+    max-width: 480px; margin: 0 auto;
+    padding: 28px 20px 40px;
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; flex-direction: column;
+  }
+  .screen { display: none; flex-direction: column; flex: 1; animation: fadein .35s ease; }
+  .screen.active { display: flex; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  .duo { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 16px; }
+  .duo-circle {
+    width: 62px; height: 62px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 27px; font-weight: 800; color: #2b0d22;
+    box-shadow: 0 8px 26px rgba(255,140,120,.30);
+  }
+  .duo-a { background: linear-gradient(135deg, #ffb648, #ff8a5c); }
+  .duo-b { background: linear-gradient(135deg, #ff8ab5, #ff6b9d); }
+  .duo-x { font-size: 22px; color: #c9a8bb; font-weight: 700; }
+
+  h1 { font-size: 30px; text-align: center; line-height: 1.2; margin-bottom: 10px; }
+  .sub { text-align: center; color: #dcb9cb; font-size: 16px; line-height: 1.5; margin-bottom: 26px; }
+
+  .card {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 20px; padding: 20px;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+  .rules { margin-bottom: 26px; }
+  .rule { display: flex; gap: 14px; align-items: flex-start; padding: 9px 0; }
+  .rule-num {
+    flex: 0 0 30px; height: 30px; border-radius: 50%;
+    background: linear-gradient(135deg, #ffb648, #ff6b9d);
+    color: #2b0d22; font-weight: 800; font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .rule p { font-size: 15.5px; line-height: 1.45; color: #f3e2ea; padding-top: 4px; }
+
+  .btn {
+    display: block; width: 100%; border: none; cursor: pointer;
+    border-radius: 16px; padding: 17px 20px;
+    font-size: 17px; font-weight: 700; font-family: inherit;
+    transition: transform .12s ease, filter .12s ease;
+    text-align: center;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary {
+    background: linear-gradient(90deg, #ffb648, #ff6b9d);
+    color: #2b0d22;
+    box-shadow: 0 6px 24px rgba(255,120,140,.35);
+  }
+  .btn-ghost {
+    background: transparent; color: #ecc9da;
+    border: 1px solid rgba(255,255,255,.22); font-weight: 600;
+  }
+  .btn + .btn { margin-top: 12px; }
+
+  .who-btn {
+    display: flex; align-items: center; gap: 16px; width: 100%;
+    background: rgba(255,255,255,.06); border: 1.5px solid rgba(255,255,255,.16);
+    border-radius: 18px; padding: 18px; margin-bottom: 14px; cursor: pointer;
+    font-family: inherit; color: #fbf2f6; transition: border-color .15s, background .15s, transform .12s;
+  }
+  .who-btn:active { transform: scale(.98); }
+  .who-circle { width: 48px; height: 48px; border-radius: 50%; flex: 0 0 48px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 21px; font-weight: 800; color: #2b0d22; }
+  .who-name { font-size: 19px; font-weight: 700; }
+
+  .quiz-top { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .back {
+    flex: 0 0 40px; height: 40px; border-radius: 12px; border: 1px solid rgba(255,255,255,.2);
+    background: transparent; color: #ecc9da; font-size: 19px; cursor: pointer; visibility: hidden;
+  }
+  .back.on { visibility: visible; }
+  .progress-wrap { flex: 1; }
+  .progress-label { font-size: 13px; color: #dcb9cb; margin-bottom: 6px; }
+  .progress-bar { height: 8px; border-radius: 99px; background: rgba(255,255,255,.12); overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; border-radius: 99px;
+    background: linear-gradient(90deg, #ffb648, #ff6b9d); transition: width .3s ease; }
+
+  .q-text { font-size: 22px; font-weight: 800; line-height: 1.3; margin: 8px 0 20px; min-height: 58px; }
+  .opt {
+    display: block; width: 100%; text-align: left; cursor: pointer;
+    background: rgba(255,255,255,.06); border: 1.5px solid rgba(255,255,255,.14);
+    color: #fbf2f6; border-radius: 16px; padding: 15px 16px; margin-bottom: 11px;
+    font-size: 16.5px; line-height: 1.35; font-family: inherit;
+    transition: border-color .15s, background .15s, transform .12s;
+  }
+  .opt:active { transform: scale(.98); }
+  .opt.picked { border-color: #ffb648; background: rgba(255,182,72,.16); }
+  .opt b { color: #ffb648; margin-right: 8px; }
+
+  .code-box {
+    text-align: center; padding: 26px 18px; margin-bottom: 16px;
+    background: rgba(255,255,255,.07); border: 1.5px dashed rgba(255,182,72,.55);
+    border-radius: 20px;
+  }
+  .code-label { font-size: 14px; color: #dcb9cb; margin-bottom: 8px; }
+  .code-value {
+    font-size: 32px; font-weight: 800; letter-spacing: 3px;
+    font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    background: linear-gradient(90deg, #ffb648, #ff6b9d);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    user-select: all; -webkit-user-select: all; word-break: break-all;
+  }
+  .hint { font-size: 13.5px; color: #c9a0b6; text-align: center; line-height: 1.45; margin-top: 12px; }
+
+  .divider { display: flex; align-items: center; gap: 14px; margin: 26px 0 18px; color: #dcb9cb; font-size: 14px; text-align: center; }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: rgba(255,255,255,.16); }
+
+  .field {
+    width: 100%; border-radius: 16px; padding: 16px;
+    background: rgba(255,255,255,.07); border: 1.5px solid rgba(255,255,255,.18);
+    color: #fff; font-size: 18px; font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    letter-spacing: 2px; text-align: center; outline: none; text-transform: uppercase;
+  }
+  .field::placeholder { color: #a8809a; letter-spacing: 1px; font-size: 15px; }
+  .field:focus { border-color: #ff6b9d; }
+  .field.err { border-color: #f87171; animation: shake .4s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  .err-text { color: #fca5a5; font-size: 14px; text-align: center; margin-top: 10px; min-height: 20px; line-height: 1.4; }
+  .field-label { font-size: 14px; color: #dcb9cb; margin: 14px 0 8px; }
+
+  .result-head { text-align: center; margin-bottom: 22px; }
+  .result-emoji { font-size: 52px; margin-bottom: 6px; }
+  .pct { font-size: 68px; font-weight: 900; line-height: 1;
+    background: linear-gradient(90deg, #ffb648, #ff6b9d);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .pct-sub { color: #dcb9cb; font-size: 15px; margin-top: 6px; }
+  .tier-title { font-size: 26px; font-weight: 800; text-align: center; margin: 14px 0 8px; }
+  .tier-text { text-align: center; color: #f0d7e2; font-size: 16px; line-height: 1.55; margin-bottom: 22px; }
+
+  .verdict {
+    text-align: center; border-radius: 20px; padding: 20px; margin-bottom: 22px;
+    background: linear-gradient(135deg, rgba(255,182,72,.18), rgba(255,107,157,.18));
+    border: 1.5px solid rgba(255,182,72,.5);
+  }
+  .verdict-label { font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: #ffd9a0; margin-bottom: 6px; }
+  .verdict-text { font-size: 21px; font-weight: 800; }
+
+  .bd { margin-bottom: 22px; }
+  .bd-title { font-size: 15px; color: #dcb9cb; margin-bottom: 12px; text-align: center; }
+  .bd-row { display: flex; gap: 12px; align-items: flex-start; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .bd-row:last-child { border-bottom: none; }
+  .bd-ico { flex: 0 0 26px; height: 26px; border-radius: 50%; font-size: 14px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+  .bd-ico.hit { background: rgba(74,222,128,.18); color: #4ade80; }
+  .bd-ico.miss { background: rgba(148,163,184,.15); color: #94a3b8; }
+  .bd-q { font-size: 14px; font-weight: 700; color: #f3e2ea; line-height: 1.35; margin-bottom: 3px; }
+  .bd-a { font-size: 13.5px; color: #c9a0b6; line-height: 1.45; }
+  .bd-a span { color: #ffd9a0; }
+
+  .footer { text-align: center; color: #a8809a; font-size: 13px; margin-top: auto; padding-top: 30px; }
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+</style>
+</head>
+<body>
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+<canvas id="confetti"></canvas>
+
+<div class="wrap">
+
+  <!-- INTRO -->
+  <section class="screen active" id="screen-intro">
+    <div class="duo">
+      <div class="duo-circle duo-a">А</div>
+      <div class="duo-x">×</div>
+      <div class="duo-circle duo-b">Я</div>
+    </div>
+    <h1>Мэтч-тест</h1>
+    <p class="sub">Адель и Яна. 10 вопросов, 2 минуты<br>и один вердикт — про прогулку.</p>
+    <div class="card rules">
+      <div class="rule"><div class="rule-num">1</div><p>Каждый проходит тест на своём телефоне и отвечает честно — без подглядываний.</p></div>
+      <div class="rule"><div class="rule-num">2</div><p>В конце получаешь секретный код. Меняетесь кодами в чате.</p></div>
+      <div class="rule"><div class="rule-num">3</div><p>Вставляешь код второго участника — тест считает мэтч и выносит вердикт.</p></div>
+    </div>
+    <button class="btn btn-primary" onclick="show('screen-who')">Пройти тест</button>
+    <button class="btn btn-ghost" onclick="show('screen-compare')">У меня уже есть два кода</button>
+    <div class="footer">Адель × Яна · тест на прогулку</div>
+  </section>
+
+  <!-- WHO -->
+  <section class="screen" id="screen-who">
+    <h1 style="font-size:24px; margin-top:12px">Кто отвечает?</h1>
+    <p class="sub" style="margin-bottom:20px">Код запомнит, чьи это ответы.</p>
+    <button class="who-btn" onclick="startQuiz(0)">
+      <span class="who-circle duo-a">А</span>
+      <span class="who-name">Я — Адель</span>
+    </button>
+    <button class="who-btn" onclick="startQuiz(1)">
+      <span class="who-circle duo-b">Я</span>
+      <span class="who-name">Я — Яна</span>
+    </button>
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="show('screen-intro')">← Назад</button>
+    <div class="footer">Адель × Яна · тест на прогулку</div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="screen" id="screen-quiz">
+    <div class="quiz-top">
+      <button class="back" id="btn-back" onclick="prevQ()">←</button>
+      <div class="progress-wrap">
+        <div class="progress-label" id="progress-label">Вопрос 1 из 10</div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+    </div>
+    <div class="q-text" id="q-text"></div>
+    <div id="q-opts"></div>
+  </section>
+
+  <!-- CODE -->
+  <section class="screen" id="screen-code">
+    <div class="duo" style="margin-top:6px">
+      <div class="duo-circle" id="code-avatar" style="width:54px;height:54px;font-size:23px">А</div>
+    </div>
+    <h1 style="font-size:24px" id="code-title">Твой код готов</h1>
+    <p class="sub" style="margin-bottom:18px">Отправь его в чат — и попроси код взамен.</p>
+    <div class="code-box">
+      <div class="code-label" id="code-label">секретный код</div>
+      <div class="code-value" id="my-code">AY-000000</div>
+    </div>
+    <button class="btn btn-primary" id="btn-copy" onclick="copyMyCode()">Скопировать код</button>
+    <button class="btn btn-ghost" id="btn-share" onclick="shareMyCode()" hidden>Поделиться…</button>
+    <p class="hint">Ответы в коде зашифрованы — подсмотреть их нельзя,<br>можно только сверить два кода.</p>
+    <div class="divider" id="divider-other">а когда придёт ответный код</div>
+    <input class="field" id="partner-code" placeholder="вставь код сюда" autocomplete="off" autocorrect="off" spellcheck="false">
+    <div class="err-text" id="partner-err"></div>
+    <button class="btn btn-primary" style="margin-top:4px" onclick="checkFromCodeScreen()">Проверить мэтч</button>
+    <div class="footer">Адель × Яна · тест на прогулку</div>
+  </section>
+
+  <!-- COMPARE TWO CODES -->
+  <section class="screen" id="screen-compare">
+    <div class="duo" style="margin-top:6px">
+      <div class="duo-circle duo-a" style="width:48px;height:48px;font-size:21px">А</div>
+      <div class="duo-x">×</div>
+      <div class="duo-circle duo-b" style="width:48px;height:48px;font-size:21px">Я</div>
+    </div>
+    <h1 style="font-size:24px">Сверить два кода</h1>
+    <p class="sub" style="margin-bottom:14px">Если оба уже прошли тест —<br>вставь коды и узнай вердикт.</p>
+    <div class="field-label">Первый код</div>
+    <input class="field" id="code-a" placeholder="AY-XXXXXX" autocomplete="off" autocorrect="off" spellcheck="false">
+    <div class="field-label">Второй код</div>
+    <input class="field" id="code-b" placeholder="AY-XXXXXX" autocomplete="off" autocorrect="off" spellcheck="false">
+    <div class="err-text" id="compare-err"></div>
+    <button class="btn btn-primary" style="margin-top:6px" onclick="compareTwo()">Проверить мэтч</button>
+    <button class="btn btn-ghost" onclick="show('screen-intro')">← Назад</button>
+    <div class="footer">Адель × Яна · тест на прогулку</div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="screen-result">
+    <div class="result-head">
+      <div class="result-emoji" id="r-emoji">🔥</div>
+      <div class="pct"><span id="r-pct">0</span>%</div>
+      <div class="pct-sub" id="r-count">0 совпадений из 10</div>
+    </div>
+    <div class="tier-title" id="r-title"></div>
+    <p class="tier-text" id="r-text"></p>
+    <div class="verdict">
+      <div class="verdict-label">вердикт теста</div>
+      <div class="verdict-text">Идём гулять 🚶</div>
+    </div>
+    <button class="btn btn-primary" id="btn-msg" onclick="copyResultMsg()">Скопировать сообщение для чата</button>
+    <div class="card bd" style="margin-top:22px">
+      <div class="bd-title">Где совпали, а где будет о чём поспорить</div>
+      <div id="bd-list"></div>
+    </div>
+    <button class="btn btn-ghost" onclick="restart()">Пройти заново</button>
+    <div class="footer">Адель × Яна · тест на прогулку</div>
+  </section>
+
+</div>
+
+<script>
+const NAMES = ["Адель", "Яна"];
+const GEN = ["Аделя", "Яны"];
+
+const QUESTIONS = [
+  { q: "Идеальный план на субботу:",
+    opts: ["Сорваться и поехать куда-нибудь без плана", "Долгая прогулка по городу и кофе", "Плед, сериал, никого не трогать", "Собрать друзей и устроить движ"],
+    short: ["спонтанная поездка", "прогулка и кофе", "плед и сериал", "движ с друзьями"] },
+  { q: "Опоздания — это:",
+    opts: ["Не про меня, прихожу заранее", "Минус 5–10 минут, это норма жизни", "Опаздываю всегда, но зато красиво вхожу", "Зависит от того, насколько жду встречу"],
+    short: ["прихожу заранее", "минус 5–10 минут", "красиво опаздываю", "зависит от встречи"] },
+  { q: "Ананасы на пицце:",
+    opts: ["Преступление против человечества", "Вкусно, и мне не стыдно", "Мне всё равно — я за роллы", "Попробую ради науки"],
+    short: ["преступление", "вкусно и не стыдно", "я за роллы", "попробую ради науки"] },
+  { q: "Кошки или собаки?",
+    opts: ["Кошки, конечно", "Собаки, без вариантов", "Все пушистые сразу", "Капибара. Не спрашивай"],
+    short: ["кошки", "собаки", "все пушистые", "капибара"] },
+  { q: "Отпуск мечты:",
+    opts: ["Горы, палатка, костёр", "Море, отель, ничего не делать", "Новый город каждые два дня", "Неважно куда — важно с кем"],
+    short: ["горы и палатка", "море и отель", "новый город каждые 2 дня", "неважно куда — важно с кем"] },
+  { q: "В споре я:",
+    opts: ["Иду до победного — могу и до утра", "Быстро остываю и предлагаю мир", "Соглашаюсь — и делаю по-своему", "Перевожу всё в шутку"],
+    short: ["до победного", "быстро остываю", "соглашаюсь и делаю по-своему", "перевожу в шутку"] },
+  { q: "Идеальное первое свидание:",
+    opts: ["Гулять и болтать до самой ночи", "Кино или выставка, потом обсуждать", "Что-то активное: каток, картинг, квест", "Уютное кафе и разговор глаза в глаза"],
+    short: ["гулять до ночи", "кино или выставка", "что-то активное", "кафе и разговор"] },
+  { q: "Кофе или чай?",
+    opts: ["Кофе, и побольше", "Чай во всех его видах", "Какао или матча — я не как все", "Энергетик. Жизнь коротка"],
+    short: ["кофе", "чай", "какао или матча", "энергетик"] },
+  { q: "Важнее всего в человеке рядом:",
+    opts: ["Чувство юмора", "Честность и прямота", "Лёгкость на подъём", "Умение слушать"],
+    short: ["юмор", "честность", "лёгкость на подъём", "умение слушать"] },
+  { q: "Если тест покажет мэтч, гуляем:",
+    opts: ["Сегодня же, чего тянуть", "На выходных, спокойно и без спешки", "Завтра — дайте день на подготовку", "Я уже собираюсь, пока отвечаю"],
+    short: ["сегодня же", "на выходных", "завтра", "уже собираюсь"] },
+];
+
+const TIERS = [
+  { min: 8, emoji: "🔥", title: "Абсолютный мэтч",
+    text: "Так совпасть случайно почти невозможно. С таким результатом сидеть по домам просто нелогично." },
+  { min: 5, emoji: "🎯", title: "Уверенный мэтч",
+    text: "Совпадений достаточно, чтобы идти гулять, а различий — ровно столько, чтобы было о чём говорить всю дорогу." },
+  { min: 2, emoji: "🧲", title: "Интригующий мэтч",
+    text: "Противоположности притягиваются — это физика, с ней не поспоришь. Но такое притяжение надо проверять лично." },
+  { min: 0, emoji: "🎲", title: "Статистическая аномалия",
+    text: "Настолько не совпасть — один шанс на миллион. Такое редкое явление положено обсуждать лично." },
+];
+
+const XOR_KEY = 1419731;
+const LIMIT = 2097152;
+
+function encode(answers, who) {
+  let v = 0;
+  for (let i = answers.length - 1; i >= 0; i--) v = v * 4 + answers[i];
+  v = v * 2 + who;
+  const obf = v ^ XOR_KEY;
+  const body = obf.toString(36).toUpperCase().padStart(5, "0");
+  const chk = ((v * 7 + 13) % 36).toString(36).toUpperCase();
+  return "AY-" + body + chk;
+}
+
+function decode(str) {
+  let t = (str || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (t.startsWith("AY")) t = t.slice(2);
+  if (t.length !== 6) return null;
+  const body = t.slice(0, 5), chk = t.slice(5);
+  const obf = parseInt(body, 36);
+  if (isNaN(obf) || obf >= LIMIT) return null;
+  const v = obf ^ XOR_KEY;
+  if (v >= LIMIT) return null;
+  if (((v * 7 + 13) % 36).toString(36).toUpperCase() !== chk) return null;
+  const who = v % 2;
+  let x = Math.floor(v / 2);
+  const a = [];
+  for (let i = 0; i < 10; i++) { a.push(x % 4); x = Math.floor(x / 4); }
+  return { answers: a, who: who };
+}
+
+let answers = [];
+let qIdx = 0;
+let me = 0;
+let myAnswers = null;
+
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo(0, 0);
+}
+
+function startQuiz(who) {
+  me = who;
+  answers = []; qIdx = 0;
+  show("screen-quiz");
+  renderQ();
+}
+
+function renderQ() {
+  const q = QUESTIONS[qIdx];
+  document.getElementById("progress-label").textContent = NAMES[me] + " · вопрос " + (qIdx + 1) + " из " + QUESTIONS.length;
+  document.getElementById("progress-fill").style.width = ((qIdx) / QUESTIONS.length * 100) + "%";
+  document.getElementById("btn-back").classList.toggle("on", qIdx > 0);
+  document.getElementById("q-text").textContent = q.q;
+  const box = document.getElementById("q-opts");
+  box.innerHTML = "";
+  const letters = ["А", "Б", "В", "Г"];
+  q.opts.forEach((opt, i) => {
+    const b = document.createElement("button");
+    b.className = "opt" + (answers[qIdx] === i ? " picked" : "");
+    b.innerHTML = "<b>" + letters[i] + "</b>" + opt;
+    b.onclick = () => pick(i, b);
+    box.appendChild(b);
+  });
+}
+
+function pick(i, btn) {
+  answers[qIdx] = i;
+  document.querySelectorAll("#q-opts .opt").forEach(o => o.classList.remove("picked"));
+  btn.classList.add("picked");
+  setTimeout(() => {
+    if (qIdx < QUESTIONS.length - 1) { qIdx++; renderQ(); }
+    else finishQuiz();
+  }, 260);
+}
+
+function prevQ() { if (qIdx > 0) { qIdx--; renderQ(); } }
+
+function finishQuiz() {
+  myAnswers = answers.slice();
+  document.getElementById("my-code").textContent = encode(myAnswers, me);
+  document.getElementById("code-title").textContent = NAMES[me] + ", твой код готов";
+  document.getElementById("code-label").textContent = "секретный код — " + NAMES[me];
+  const av = document.getElementById("code-avatar");
+  av.textContent = me === 0 ? "А" : "Я";
+  av.className = "duo-circle " + (me === 0 ? "duo-a" : "duo-b");
+  av.style.width = "54px"; av.style.height = "54px"; av.style.fontSize = "23px";
+  document.getElementById("divider-other").textContent = "а когда придёт код " + GEN[1 - me];
+  document.getElementById("partner-code").value = "";
+  document.getElementById("partner-err").textContent = "";
+  show("screen-code");
+}
+
+async function copyText(text, btn, okLabel) {
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; }
+  catch (e) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+    } catch (e2) { ok = false; }
+  }
+  if (btn) {
+    const orig = btn.dataset.orig || btn.textContent;
+    btn.dataset.orig = orig;
+    btn.textContent = ok ? okLabel : "Не вышло — выдели и скопируй вручную";
+    setTimeout(() => { btn.textContent = orig; }, 2200);
+  }
+  return ok;
+}
+
+function copyMyCode() {
+  copyText(document.getElementById("my-code").textContent, document.getElementById("btn-copy"), "Скопировано ✓");
+}
+
+function shareMyCode() {
+  const code = document.getElementById("my-code").textContent;
+  const text = "Мой код в нашем мэтч-тесте: " + code + ". Твой ход!";
+  if (navigator.share) navigator.share({ text }).catch(() => {});
+}
+
+function fail(inp, err, msg) {
+  err.textContent = msg;
+  inp.classList.add("err");
+  setTimeout(() => inp.classList.remove("err"), 500);
+}
+
+function checkFromCodeScreen() {
+  const inp = document.getElementById("partner-code");
+  const err = document.getElementById("partner-err");
+  const theirs = decode(inp.value);
+  if (!theirs) {
+    fail(inp, err, "Код не распознан. Формат: AY-XXXXXX — проверь, всё ли на месте.");
+    return;
+  }
+  if (theirs.who === me) {
+    fail(inp, err, "Похоже, это тоже код " + GEN[me] + ". Нужен код " + GEN[1 - me] + ".");
+    return;
+  }
+  err.textContent = "";
+  showResult(myAnswers, theirs.answers, me);
+}
+
+function compareTwo() {
+  const ia = document.getElementById("code-a");
+  const ib = document.getElementById("code-b");
+  const err = document.getElementById("compare-err");
+  const a = decode(ia.value), b = decode(ib.value);
+  if (!a || !b) {
+    fail(!a ? ia : ib, err, "Один из кодов не распознан. Формат: AY-XXXXXX.");
+    return;
+  }
+  if (a.who === b.who) {
+    fail(ib, err, "Оба кода — от " + GEN[a.who] + ". Нужны коды обоих участников.");
+    return;
+  }
+  err.textContent = "";
+  const adel = a.who === 0 ? a : b;
+  const yana = a.who === 0 ? b : a;
+  showResult(adel.answers, yana.answers, 0);
+}
+
+let lastScore = 0;
+
+function showResult(mineAns, otherAns, leftWho) {
+  const leftName = NAMES[leftWho], rightName = NAMES[1 - leftWho];
+  let score = 0;
+  for (let i = 0; i < QUESTIONS.length; i++) if (mineAns[i] === otherAns[i]) score++;
+  lastScore = score;
+
+  const tier = TIERS.find(t => score >= t.min);
+  document.getElementById("r-emoji").textContent = tier.emoji;
+  document.getElementById("r-count").textContent = score + " " + plural(score) + " из 10";
+  document.getElementById("r-title").textContent = tier.title;
+  let text = tier.text;
+  if (score === 10) text += " 10 из 10 — либо вы сговорились, либо это судьба.";
+  document.getElementById("r-text").textContent = text;
+
+  const list = document.getElementById("bd-list");
+  list.innerHTML = "";
+  QUESTIONS.forEach((q, i) => {
+    const hit = mineAns[i] === otherAns[i];
+    const row = document.createElement("div");
+    row.className = "bd-row";
+    const ans = hit
+      ? "оба: <span>" + q.short[mineAns[i]] + "</span>"
+      : leftName + ": <span>" + q.short[mineAns[i]] + "</span> · " + rightName + ": <span>" + q.short[otherAns[i]] + "</span>";
+    row.innerHTML =
+      '<div class="bd-ico ' + (hit ? "hit" : "miss") + '">' + (hit ? "✓" : "≠") + "</div>" +
+      '<div><div class="bd-q">' + q.q + '</div><div class="bd-a">' + ans + "</div></div>";
+    list.appendChild(row);
+  });
+
+  show("screen-result");
+  animatePct(score * 10);
+  burstConfetti();
+}
+
+function plural(n) {
+  if (n === 1) return "совпадение";
+  if (n >= 2 && n <= 4) return "совпадения";
+  return "совпадений";
+}
+
+function copyResultMsg() {
+  const msg = lastScore + "/10 — тест официально постановил: мы идём гулять. Когда?";
+  copyText(msg, document.getElementById("btn-msg"), "Скопировано ✓ — отправляй");
+}
+
+function animatePct(target) {
+  const el = document.getElementById("r-pct");
+  const dur = 1200; let start = null;
+  function step(ts) {
+    if (!start) start = ts;
+    const p = Math.min((ts - start) / dur, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(target * ease);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function restart() {
+  answers = []; qIdx = 0; myAnswers = null;
+  document.getElementById("code-a").value = "";
+  document.getElementById("code-b").value = "";
+  show("screen-intro");
+}
+
+function burstConfetti() {
+  const cv = document.getElementById("confetti");
+  const ctx = cv.getContext("2d");
+  cv.width = window.innerWidth; cv.height = window.innerHeight;
+  const colors = ["#ffb648", "#ff6b9d", "#ff8a5c", "#ffffff", "#4ade80"];
+  const parts = [];
+  for (let i = 0; i < 130; i++) {
+    parts.push({
+      x: cv.width / 2 + (Math.random() - 0.5) * cv.width * 0.5,
+      y: -20 - Math.random() * 80,
+      vx: (Math.random() - 0.5) * 3,
+      vy: 2 + Math.random() * 3.5,
+      size: 5 + Math.random() * 6,
+      rot: Math.random() * Math.PI,
+      vr: (Math.random() - 0.5) * 0.25,
+      color: colors[Math.floor(Math.random() * colors.length)],
+    });
+  }
+  const t0 = performance.now();
+  function frame(t) {
+    const elapsed = t - t0;
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    parts.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = Math.max(0, 1 - elapsed / 2600);
+      ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+      ctx.restore();
+    });
+    if (elapsed < 2600) requestAnimationFrame(frame);
+    else ctx.clearRect(0, 0, cv.width, cv.height);
+  }
+  requestAnimationFrame(frame);
+}
+
+if (navigator.share) document.getElementById("btn-share").hidden = false;
+
+document.getElementById("partner-code").addEventListener("keydown", e => { if (e.key === "Enter") checkFromCodeScreen(); });
+document.getElementById("code-b").addEventListener("keydown", e => { if (e.key === "Enter") compareTwo(); });
+</script>
+</body>
+</html>
